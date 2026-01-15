@@ -1,0 +1,16 @@
+# Data Folders (Huge)
+api_data_aadhar_enrolment/
+api_data_aadhar_demographic/
+api_data_aadhar_biometric/
+processed_data/
+
+# Generated Results (CSVs might be large, keeping charts)
+results/*.csv
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
