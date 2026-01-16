@@ -21,17 +21,32 @@ def train_forecast_model(df, district_name, periods=180):
     # Simple Train/Test Split logic (Last 30 days for validation)
     train = daily_series.iloc[:-30]
     test = daily_series.iloc[-30:]
+
+    # Recalibration: Apply Log-Transform to handle non-linear growth and prevent negative predictions
+    train_log = np.log1p(train)
     
-    # Fit SARIMA (Simple order for speed, can be optimized)
-    # Order: (p,d,q) = (1,1,1), Seasonal Order: (1,1,1,7) [Weekly seasonality]
-    print(f"Training SARIMA model for {district_name}...")
-    model = SARIMAX(train, order=(1, 1, 1), seasonal_order=(1, 1, 1, 7))
-    model_fit = model.fit(disp=False)
+    # Fit SARIMA on Log-Transformed Data
+    # increased MA term to catch sharp spikes
+    print(f"Training 'Antigravity' SARIMA model for {district_name} (Log-Scale)...")
+    try:
+        model = SARIMAX(train_log, order=(1, 1, 2), seasonal_order=(0, 1, 1, 7), enforce_stationarity=False, enforce_invertibility=False)
+        model_fit = model.fit(disp=False)
+    except:
+        # Fallback to simpler model if complex one fails
+        model = SARIMAX(train_log, order=(1, 1, 0), seasonal_order=(0, 1, 0, 7))
+        model_fit = model.fit(disp=False)
     
-    # Predict
-    forecast = model_fit.get_forecast(steps=periods)
-    forecast_df = forecast.conf_int()
-    forecast_df['Forecast'] = model_fit.predict(start=forecast.row_labels[0], end=forecast.row_labels[-1])
+    # Predict in Log Scale
+    forecast_log = model_fit.get_forecast(steps=periods)
+    forecast_df = forecast_log.conf_int()
+    
+    # Inverse Transform (Exp) to return to Real Scale
+    forecast_df['Forecast'] = np.expm1(model_fit.predict(start=forecast_log.row_labels[0], end=forecast_log.row_labels[-1]))
+    forecast_df.iloc[:, 0] = np.expm1(forecast_df.iloc[:, 0]) # Lower CI
+    forecast_df.iloc[:, 1] = np.expm1(forecast_df.iloc[:, 1]) # Upper CI
+    
+    # Ensure no negative values (Physics enforcement)
+    forecast_df[forecast_df < 0] = 0
     
     return daily_series, forecast_df
 

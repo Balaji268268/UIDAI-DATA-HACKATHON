@@ -5,7 +5,8 @@ api_data_aadhar_biometric/
 processed_data/
 
 # Generated Results (CSVs might be large, keeping charts)
-results/*.csv
+# Generated Results
+# results/*.csv -> Commented out to allow pushing forecast data
 
 
 # Python
