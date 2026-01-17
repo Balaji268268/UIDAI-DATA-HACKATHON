@@ -4,7 +4,6 @@
 **Aadhaar 360** is a "Massive Solution" designed to transform raw Aadhaar data into a **Decision Support System**. It moves beyond static reports to offer **Interactive, 3D Strategic Intelligence**—predicting migration, flagging security risks, and identifying "Ghost Children" across the nation.
 
 ## 🚀 The "Antigravity" Advantage
-*   **Systemic Lift**: We don't just find problems; we optimize resource allocation using **Time-Series Forecasting (SARIMA)**.
 *   **Massive Dynamics**: Capable of processing millions of records to find specific, actionable anomalies.
 *   **Interactive Gravity Maps**: All insights are delivered as high-performance **Plotly HTML Artifacts**—zoomable, clickable, and 3D.
 
@@ -33,10 +32,6 @@
 4.  **🛡️ The Integrity Shield**: Using **Isolation Forest (ML)** to detect operational anomalies (e.g., impossible daily throughput).
 5.  **🎓 Youth Awareness Tracker**: Correlating biometric updates with enrolment data to ensure 15yo compliance.
 
-## 🔮 Time-Traveler Module (Forecasting)
-*   **Antigravity Engine**: Uses SARIMA (order=(1,1,2)) with Log-Linear Transforms to predict future demand for the **Top 3 High-Gravity Districts**.
-*   **Output**: 3D Demand Surface Maps & Interactive Confidence Intervals.
-
 ## 🛠️ How to Run
 
 1.  **Install Dependencies**:
@@ -48,7 +43,7 @@
     ```bash
     python run_pipeline.py
     ```
-    *   This ONE command cleans data, runs the 5-Pillar Analysis, Trains Models, and Generates all HTML Dashboards in `results/`.
+    *   This ONE command cleans data and runs the 5-Pillar Analysis to generate HTML Dashboards in `results/`.
 
 ## 📊 Datasets Used
 - **Aadhaar Enrolment Dataset**: For age-demographic breakdowns and "Ghost Child" analysis.

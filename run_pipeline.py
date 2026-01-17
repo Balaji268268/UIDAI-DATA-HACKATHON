@@ -6,13 +6,12 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 from sklearn.ensemble import IsolationForest
 from utils import load_and_merge_datasets, basic_preprocessing
-from forecasting_engine import run_prediction_engine
 
 def generate_massive_insights(enrolment, demographic, biometric, output_dir):
     """
     Generates the 5 Strategic Insight Pillars as Interactive Plotly Artifacts.
     """
-    print("\n[Phase 3] engaging Massive Dynamics Engine (5-Pillar Analysis)...")
+    print("\n[Phase 2] Engaging Massive Dynamics Engine (5-Pillar Analysis)...")
     
     # Pillar 1: Ghost Child Finder
     district_ages = enrolment.groupby(['state', 'district'])[['age_0_5', 'age_5_17', 'age_18_greater']].sum().reset_index()
@@ -99,109 +98,6 @@ def generate_massive_insights(enrolment, demographic, biometric, output_dir):
     print(f"  -> Generated: 5_youth_tracker_compliance.html")
 
 
-def save_forecast_results_plotly(results, output_dir):
-    """
-    Saves forecast data and generates interactive Plotly visualizations (3D/Dynamic).
-    """
-    os.makedirs(output_dir, exist_ok=True)
-    
-    combined_data = []
-
-    for district, data in results.items():
-        history = data['history']
-        forecast = data['forecast']
-        
-        # 1. Save CSV
-        csv_path = os.path.join(output_dir, f'forecast_{district}.csv')
-        forecast.to_csv(csv_path)
-        
-        # Prepare Data for Plotting
-        hist_df = history.reset_index()
-        hist_df.columns = ['date', 'value']
-        hist_df['Type'] = 'Historical'
-        
-        fore_df = forecast.reset_index()
-        fore_df = fore_df.rename(columns={'index': 'date', 'Forecast': 'value'})
-        # Ensure integer values for User Clarity
-        fore_df['value'] = fore_df['value'].round().astype(int)
-        fore_df = fore_df[['date', 'value']]
-        fore_df['Type'] = 'Forecast'
-        
-        full_df = pd.concat([hist_df.tail(120), fore_df]) 
-        
-        # 2. Individual District Dynamic Chart
-        fig = go.Figure()
-        
-        # Historical Line
-        fig.add_trace(go.Scatter(
-            x=hist_df.tail(120)['date'], 
-            y=hist_df.tail(120)['value'],
-            mode='lines',
-            name='Historical Demand',
-            hovertemplate='Date: %{x}<br>Demand: %{y:,.0f}<extra></extra>',
-            line=dict(color='gray', width=2)
-        ))
-        
-        # Forecast Line
-        fig.add_trace(go.Scatter(
-            x=fore_df['date'], 
-            y=fore_df['value'],
-            mode='lines+markers',
-            name='Predicted Demand',
-            hovertemplate='Date: %{x}<br>Predicted: %{y:,.0f}<extra></extra>',
-            line=dict(color='cyan', width=3,  shape='spline')
-        ))
-        
-        # Confidence Interval
-        fig.add_trace(go.Scatter(
-            x=pd.concat([fore_df['date'], fore_df['date'][::-1]]),
-            y=pd.concat([forecast.iloc[:, 1], forecast.iloc[:, 0][::-1]]),
-            fill='toself',
-            fillcolor='rgba(0, 255, 255, 0.2)',
-            line=dict(color='rgba(255,255,255,0)'),
-            hoverinfo="skip",
-            showlegend=True,
-            name='Probability Cloud'
-        ))
-
-        fig.update_layout(
-            title=f"Gravity Well Analysis: {district}",
-            template="plotly_dark",
-            xaxis_title="Temporal Coordinates (Date)",
-            yaxis_title="Mass (Enrolment Demand)",
-            hovermode="x unified"
-        )
-        
-        html_path = os.path.join(output_dir, f'dynamic_chart_{district}.html')
-        fig.write_html(html_path)
-        print(f"Saved Dynamic Map for {district}: {html_path}")
-        
-        subset = fore_df.copy()
-        subset['District'] = district
-        combined_data.append(subset)
-
-    # 3. Create 3D Surface Field Visualization
-    if combined_data:
-        all_forecasts = pd.concat(combined_data)
-        
-        fig3d = px.line_3d(
-            all_forecasts, 
-            x='date', 
-            y='District', 
-            z='value', 
-            color='District',
-            title="3D Antigravity Field: Multi-District Demand Surface",
-            template="plotly_dark"
-        )
-        fig3d.update_layout(scene = dict(
-                    xaxis_title='Time',
-                    yaxis_title='District',
-                    zaxis_title='Demand Amplitude'))
-        
-        html_3d_path = os.path.join(output_dir, '3d_antigravity_field.html')
-        fig3d.write_html(html_3d_path)
-        print(f"Saved 3D Field Visualization: {html_3d_path}")
-
 def main():
     print("========================================")
     print("   AADHAAR 360 - MASSIVE DYNAMICS ENGINE   ")
@@ -209,6 +105,7 @@ def main():
     
     # 1. Data Ingestion
     print("\n[Phase 1] Calibrating Sensors (Data Ingestion)...")
+
     base_path = 'd:/UIDAI'
     raw_data = load_and_merge_datasets(base_path)
     cleaned_data = basic_preprocessing(raw_data)
@@ -253,21 +150,12 @@ def main():
 
     results_dir = os.path.join(base_path, 'results')
 
-    # 2. Advanced Forecasting (Smart Selection)
-    print("\n[Phase 2] Engaging Antigravity Engine (Log-Linear Predictions)...")
-    # Smart Select: Only forecast districts with MEANINGFUL volume to avoid '1s and 0s'
-    # Criteria: Top 3 districts by TOTAL volume
-    top_districts = enrolment_df.groupby('district')['Total_Enrolments'].sum().nlargest(3).index.tolist()
-    print(f"Targeting High-Gravity Districts: {top_districts}")
-    
-    forecast_results = run_prediction_engine(os.path.join(base_path, 'processed_data', 'enrolment_clean.csv'), target_districts=top_districts)
-    save_forecast_results_plotly(forecast_results, results_dir)
-    
-    # 3. Massive Insight Generation
+
+    # 2. Massive Insight Generation (The 5 Pillars)
     generate_massive_insights(enrolment_df, demographic_df, biometric_df, results_dir)
     
     print("\n========================================")
-    print("   MISSION ACCOMPLISHED - SYSTEM ACTIVATED   ")
+    print("   MISSION ACCOMPLISHED - INTELLIGENCE GRID ACTIVE   ")
     print("========================================")
 
 if __name__ == "__main__":
